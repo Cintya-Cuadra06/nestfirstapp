@@ -1,4 +1,6 @@
 import { TasksService } from "./tasks.service";
+import {  } from 'class-validator'
+
 
 export enum TaskStatus {
     PENDING = 'PENDING',
