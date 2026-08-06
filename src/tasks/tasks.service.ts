@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Task, TaskStatus } from './task.entity';
 import { v4 } from 'uuid'
 import { UpdatedTaskDto } from './dto/task.dto';
@@ -16,7 +16,7 @@ export class TasksService {
     getAllTasks(){
         return this.tasks;
     }
-//crea una nueva tarea con base en esos parametros, con un id totalmente unico
+//crea una nueva tarea con base en esos parametros, con un id totalmente unico y devuelve la tarea creada
     createTask(title: string, description: string, ){
         const task = {
             id: v4(),
@@ -28,21 +28,28 @@ export class TasksService {
 
         return task;
     }
-
+//busca una tarea por su identificador y devuelve esa misma
     getTaskById(id: string): Task {
         return this.tasks.find(task => task.id === id)!
     }
+
+    //actualiza la tarea con los campos que el usuario requiera
     updateTask(id: string, updatedFields: UpdatedTaskDto): Task{
         const task = this.getTaskById(id)
+        if(!task) {
+            throw new NotFoundException("La tarea no existe")
+        }
         const newTask = Object.assign(task, updatedFields)
         this.tasks = this.tasks.map(task => task.id === id ? newTask : task )
         return newTask;
     }
 
-
-
-
+//elimina una tarea por su identificador
     deleteTask(id: string){
+        const task = this.getTaskById(id)
+        if(!task) {
+            throw new NotFoundException("La tarea no existe")
+        }
        this.tasks = this.tasks.filter(task => task.id !== id)
     }
 
